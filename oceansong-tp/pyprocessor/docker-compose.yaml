@@ -1,0 +1,10 @@
+#This is compose file. It build a container from image oceansong-processor-tt:6.0
+#and execute command in order to connect to validator
+
+container-oceansong-tp:
+  image: oceansong-processor-tt:6.0
+  container_name: test63
+  expose:
+    - 4004
+  command: ./ocean-tp tcp://172.20.0.2:4004
+  stop_signal: SIGKILL

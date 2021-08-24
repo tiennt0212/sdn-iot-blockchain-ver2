@@ -17,7 +17,7 @@ LOGGER = logging.getLogger(__name__)
 
 FAMILY_NAME = "oceansong"
 manager = tokenlib.TokenManager(secret="OCEANSONG")
-TP_URL = "tcp://172.20.0.2:4004" #Validator url
+# TP_URL = "tcp://172.20.0.2:4004" #Validator url
 # vpls = 'UIT'
 
 def _hash(data):
@@ -153,12 +153,12 @@ def setup_loggers():
     logging.basicConfig()
     logging.getLogger().setLevel(logging.DEBUG)
 
-def main():
+def main(argv):
     '''Entry-point function for the simplewallet transaction processor.'''
     setup_loggers()
     try:
         # Register the transaction handler and start it.
-        processor = TransactionProcessor(url=TP_URL)
+        processor = TransactionProcessor(url=sys.argv[1])
 
         handler = OceanTransactionHandler(sw_namespace)
 
