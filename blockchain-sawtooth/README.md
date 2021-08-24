@@ -3,10 +3,9 @@
 ![init-project](./images/single-node.png)
 
 # Network model in case of multiple validator
-https://sawtooth.hyperledger.org/docs/core/releases/latest/app_developers_guide/docker_test_network.html
-<br/>
-**Important:** Each node in this network runs a validator, REST-API, settings-tp and OCEAN-tp
-Important: Each node in a Sawtooth network must run the same set of transaction processors.
+https://sawtooth.hyperledger.org/docs/core/releases/latest/app_developers_guide/docker_test_network.html <br/>
+Each node in this network runs a validator, REST-API, settings-tp and OCEAN-tp <br/>
+**Important:**  Each node in a Sawtooth network must run the same set of transaction processors.
 ![init-project](./images/multi-validator.png)
 ### About consensus algorithm
 You can choose either PBFT or PoET consensus.
