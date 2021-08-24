@@ -248,7 +248,7 @@ services:
     stop_signal: SIGKILL
 
   oceansong-tp-0:
-    image: oceansong-processor-tt:6.0
+    image: thanhtien-oceansong-tp:6.0
     container_name: thanhtien-oceansong-tp-0
     expose:
       - 4004
@@ -256,7 +256,7 @@ services:
     stop_signal: SIGKILL
 
   oceansong-tp-1:
-    image: oceansong-processor-tt:6.0
+    image: thanhtien-oceansong-tp:6.0
     container_name: thanhtien-oceansong-tp-1
     expose:
       - 4004
@@ -264,7 +264,7 @@ services:
     stop_signal: SIGKILL
 
   oceansong-tp-2:
-    image: oceansong-processor-tt:6.0
+    image: thanhtien-oceansong-tp:6.0
     container_name: thanhtien-oceansong-tp-2
     expose:
       - 4004
@@ -272,7 +272,7 @@ services:
     stop_signal: SIGKILL
 
   oceansong-tp-3:
-    image: oceansong-processor-tt:6.0
+    image: thanhtien-oceansong-tp:6.0
     container_name: thanhtien-oceansong-tp-3
     expose:
       - 4004
@@ -280,7 +280,7 @@ services:
     stop_signal: SIGKILL
 
   oceansong-tp-4:
-    image: oceansong-processor-tt:6.0
+    image: thanhtien-oceansong-tp:6.0
     container_name: thanhtien-oceansong-tp-4
     expose:
       - 4004
