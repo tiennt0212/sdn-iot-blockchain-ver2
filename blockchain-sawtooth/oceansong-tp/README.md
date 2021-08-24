@@ -1,1 +1,1 @@
-!(init-project)(./images/single-node.png)
+![init-project](./images/single-node.png)
