@@ -1,1 +1,0 @@
-![init-project](./images/single-node.png)
