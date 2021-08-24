@@ -14,7 +14,6 @@ You can choose either PBFT or PoET consensus. <br/>
 # How to build a network with OCEAN transaction processor?
 ## First of all, generate a docker image for transaction processor
 ```
-cd oceansong-tp/pyprocessor
 docker build -t thanhtien-oceansong-tp:6.0 ./oceansong-tp/pyprocessor
 ```
 > This command will make a docker images. This images will be used in docker-compose file (at Second step)
