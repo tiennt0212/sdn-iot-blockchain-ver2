@@ -1,3 +1,5 @@
+#This Dockerfile is use to create a docker image. The new image will run OCEAN Transaction Processor
+
 FROM ubuntu:bionic
 
 ARG DEBIAN_FRONTEND=noninteractive
