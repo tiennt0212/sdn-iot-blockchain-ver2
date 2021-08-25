@@ -11,9 +11,10 @@ from colorlog import ColoredFormatter
 
 from client.ocean_client import OceanClient
 
-DISTRIBUTION_NAME = 'simplewallet'
+DISTRIBUTION_NAME = 'oceansong'
 
-DEFAULT_URL = 'http://172.20.0.3:8008' #IP of REST-API
+# REST_API_URL = 'http://172.20.0.3:8008' #IP of REST-API
+REST_API_URL = os.environ.get('REST_API_URL')
 
 def create_console_handler(verbose_level):
     clog = logging.StreamHandler()
@@ -43,7 +44,7 @@ def add_register_parser(subparsers, parent_parser):
     '''Define the "register" command line parsing.'''
     parser = subparsers.add_parser(
         'add-device',
-        help='add new device to this',
+        help='add new device to Bubble',
         parents=[parent_parser])
 
     parser.add_argument(
@@ -112,7 +113,7 @@ def do_add_device(args):
     with open(args.fileInfo) as file:
         info = json.load(file)
 
-    client = OceanClient(baseUrl=DEFAULT_URL, keyFile=keyfile)
+    client = OceanClient(baseUrl=REST_API_URL, keyFile=keyfile)
 
     response = client.add_device(info)
 

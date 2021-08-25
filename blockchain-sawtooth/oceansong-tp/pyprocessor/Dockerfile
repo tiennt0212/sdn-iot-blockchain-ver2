@@ -1,4 +1,4 @@
-#This Dockerfile is use to create a docker image. The new image will run OCEAN Transaction Processor
+#This Dockerfile is use to create a docker image. The new image can use to run OCEAN Transaction Processor
 
 FROM ubuntu:bionic
 
