@@ -1,0 +1,7 @@
+{
+	"nodeID": "M000001",
+    "type": "M",
+	"category": "attack-detection",
+	"size": 12345,
+	"description": "Model node"
+}

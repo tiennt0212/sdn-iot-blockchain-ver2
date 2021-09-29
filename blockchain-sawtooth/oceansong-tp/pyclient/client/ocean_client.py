@@ -1,11 +1,16 @@
+
 import hashlib
 import base64
 import random
 import requests
+from requests.api import request
+from requests.models import Response
 import yaml
 import tokenlib
 import json
 import array as arr
+import time
+import string
 
 from sawtooth_signing import create_context
 from sawtooth_signing import CryptoFactory
@@ -72,7 +77,39 @@ class OceanClient(object):
     # 1. Do any additional handling, if required
     # 2. Create a transaction and a batch
     # 3. Send to rest-api
-    def add_device(self, info):
+    
+    def _wait_for_commit(self, batchID=None, contentType=None):
+        '''Send a REST command to the Validator via the REST API.'''
+
+        if self._baseUrl.startswith("http://"):
+            url = "{}/{}".format(self._baseUrl, "batch_statuses")
+        else:
+            url = "http://{}/{}".format(self._baseUrl, "batch_statuses")
+
+        headers = {}
+
+        if contentType is not None:
+            headers['Content-Type'] = contentType
+        
+        params = {'id': batchID, 'wait':5}
+        try:
+            if batchID is not None:
+                result = requests.get(url, params=params, headers=headers )
+
+            if not result.ok:
+                raise Exception("Error {}: {}".format(
+                    result.status_code, result.reason))
+
+        except requests.ConnectionError as err:
+            raise Exception(
+                'Failed to connect to {}: {}'.format(url, str(err)))
+
+        except BaseException as err:
+            raise Exception(err)
+
+        return result.text
+
+    def register(self, info):
         # I have infomation of that device, so i generate a token from it.
         token=_generate_token(info)
         
@@ -81,10 +118,68 @@ class OceanClient(object):
         
         #Finally, send data to _wrap_and_send with command "add-device"
         #to notice that "I want to add this device to my network"
-        return self._wrap_and_send(
-            "add-device",
+        responseRegister = self._wrap_and_send(
+            "register",
             data)
 
+        # Check success of this transaction.
+        # If success, save token
+        json_response = json.loads(responseRegister)
+        link = json_response["link"]
+        waitCommit = requests.get(link, params = {'wait':5})
+        if ("COMMITTED" in str(waitCommit.content)):
+            filepath = './data/.secret/token' + ''.join(random.choice(string.ascii_letters + string.digits) for _ in range(5))
+            mode = 'w+'
+            f = open(filepath, mode)
+            f.write(token)
+            f.close()
+            return responseRegister
+        
+        return "Has some problem"
+
+    def model_request(self, token, infoRequest):
+        # Client send token and info to request model.
+        # First step, append token and info
+        data = list((token, infoRequest))
+        
+        return self._wrap_and_send(
+            "model-request",
+            data
+        )
+
+    def model_verify(self, token, infoVerify):
+        # Calculate Hash from file
+        sha512 = hashlib.sha512()
+        BUF_SIZE = 65536 #64KB
+        with open(infoVerify['modelFile'], 'rb') as f:
+            fb = f.read(BUF_SIZE)
+            while len(fb) > 0:
+                sha512.update(fb)
+                fb = f.read(BUF_SIZE)
+        
+        # Add new element modelHash
+        infoVerify['modelHash'] = sha512.hexdigest()
+
+        # Delete element 'modelFile'
+        del infoVerify['modelFile']
+
+        print(infoVerify)
+
+        data = list((token, infoVerify))
+        
+        return self._wrap_and_send(
+            "model-verify",
+            data
+        )
+
+    def task_assign(self, token, infoTask):
+        data = list((token, infoTask))
+        
+        return self._wrap_and_send(
+            "task-assign",
+            data
+        )
+    
     def _send_to_restapi(self,
                          suffix,
                          data=None,
@@ -138,7 +233,6 @@ class OceanClient(object):
             rawPayload = "@".join([rawPayload, str(val)])
             # i+=1
 
-        print(rawPayload)
         # print("Loop {} time".format(i))
 
         payload = rawPayload.encode()

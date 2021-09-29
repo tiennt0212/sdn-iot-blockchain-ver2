@@ -1,4 +1,4 @@
-#This Dockerfile is use to create a docker image. The new image can use to run OCEAN Transaction Processor
+# This Dockerfile is use to create a docker image. The new image can use to run OCEAN Transaction Processor
 
 FROM ubuntu:bionic
 
@@ -12,6 +12,7 @@ RUN apt-key adv --keyserver hkp://keyserver.ubuntu.com:80 --recv-keys 8AA7AF1F10
 
 RUN apt-get update \
  && apt-get install -y -q \
+    net-tools \
     apt-transport-https \
     build-essential \
     ca-certificates \

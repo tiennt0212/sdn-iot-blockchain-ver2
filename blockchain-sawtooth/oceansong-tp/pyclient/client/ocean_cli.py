@@ -13,8 +13,8 @@ from client.ocean_client import OceanClient
 
 DISTRIBUTION_NAME = 'oceansong'
 
-# REST_API_URL = 'http://172.20.0.3:8008' #IP of REST-API
-REST_API_URL = os.environ.get('REST_API_URL')
+REST_API_URL = 'http://172.21.0.3:8008' #IP of REST-API
+# REST_API_URL = os.environ.get('REST_API_URL')
 
 def create_console_handler(verbose_level):
     clog = logging.StreamHandler()
@@ -41,10 +41,9 @@ def setup_loggers(verbose_level):
     logger.addHandler(create_console_handler(verbose_level))
 
 def add_register_parser(subparsers, parent_parser):
-    '''Define the "register" command line parsing.'''
     parser = subparsers.add_parser(
-        'add-device',
-        help='add new device to Bubble',
+        'register',
+        help='register new Node with BlockChain',
         parents=[parent_parser])
 
     parser.add_argument(
@@ -53,9 +52,72 @@ def add_register_parser(subparsers, parent_parser):
         help='file JSON contain data of this device')
 
     parser.add_argument(
-        'masterKey',
+        'nodeKey',
         type=str,
         help='the key of master node')
+
+def add_modelrequest_parser(subparsers, parent_parser):
+    parser = subparsers.add_parser(
+        'model-request',
+        help='send request to get Global Model from A-node',
+        parents=[parent_parser])
+
+    parser.add_argument(
+        'token',
+        type=str,
+        help='text-file only contain token of this Node')
+
+    parser.add_argument(
+        'dataFile',
+        type=str,
+        help='JSON-file contain infomation about request')
+
+    parser.add_argument(
+        'nodeKey',
+        type=str,
+        help='the node key')
+
+def add_modelverify_parser(subparsers, parent_parser):
+    parser = subparsers.add_parser(
+        'model-verify',
+        help='verify a Model have been trained by this Node',
+        parents=[parent_parser])
+
+    parser.add_argument(
+        'token',
+        type=str,
+        help='text-file only contain token of this Node')
+
+    parser.add_argument(
+        'dataFile',
+        type=str,
+        help='JSON-file contain infomation about verification')
+
+    parser.add_argument(
+        'nodeKey',
+        type=str,
+        help='the node key')
+
+def add_taskassign_parser(subparsers, parent_parser):
+    parser = subparsers.add_parser(
+        'task-assign',
+        help='verify a Model have been trained by this Node',
+        parents=[parent_parser])
+
+    parser.add_argument(
+        'token',
+        type=str,
+        help='text-file only contain token of this Node')
+
+    parser.add_argument(
+        'dataFile',
+        type=str,
+        help='JSON-file contain infomation about verification')
+
+    parser.add_argument(
+        'nodeKey',
+        type=str,
+        help='the node key')
 
 def create_parent_parser(prog_name):
     '''Define the -V/--version command line options.'''
@@ -89,6 +151,9 @@ def create_parser(prog_name):
     subparsers.required = True
 
     add_register_parser(subparsers, parent_parser)
+    add_modelrequest_parser(subparsers, parent_parser)
+    add_modelverify_parser(subparsers, parent_parser)
+    add_taskassign_parser(subparsers, parent_parser)
 
     return parser
 
@@ -106,16 +171,69 @@ def _get_pubkeyfile(customerName):
 
     return '{}/{}.pub'.format(key_dir, customerName)
 
-def do_add_device(args):
+def do_register(args):
     '''Implements the "register" subcommand by calling the client class.'''
-    keyfile = _get_keyfile(args.masterKey)
+    keyfile = _get_keyfile(args.nodeKey)
 
     with open(args.fileInfo) as file:
         info = json.load(file)
 
     client = OceanClient(baseUrl=REST_API_URL, keyFile=keyfile)
 
-    response = client.add_device(info)
+    response = client.register(info)
+
+    print("Response: {}".format(response))
+
+def do_model_request(args):
+    keyfile = _get_keyfile(args.nodeKey)
+
+    with open(args.token) as file:
+        token = file.read()
+        # Token has specify character '\n'
+        # I have to remove '\n' by strip()
+        token = token.strip()
+
+    with open(args.dataFile) as file:
+        infoRequest = json.load(file)
+
+    client = OceanClient(baseUrl=REST_API_URL, keyFile=keyfile)
+
+    response = client.model_request(token, infoRequest)
+
+    print("Response: {}".format(response))
+
+def do_model_verify(args):
+    keyfile = _get_keyfile(args.nodeKey)
+
+    with open(args.token) as file:
+        token = file.read()
+        # Token has specify character '\n'
+        # I have to remove '\n' by strip()
+        token = token.strip()
+
+    with open(args.dataFile) as file:
+        infoVerify = json.load(file)
+
+    client = OceanClient(baseUrl=REST_API_URL, keyFile=keyfile)
+
+    response = client.model_verify(token, infoVerify)
+
+    print("Response: {}".format(response))
+
+def do_task_assign(args):
+    keyfile = _get_keyfile(args.nodeKey)
+    with open(args.token) as file:
+        token = file.read()
+        # Token has specify character '\n'
+        # I have to remove '\n' by strip()
+        token = token.strip()
+
+    with open(args.dataFile) as file:
+        infoAssign = json.load(file)
+
+    client = OceanClient(baseUrl=REST_API_URL, keyFile=keyfile)
+    
+    response = client.task_assign(token, infoAssign)
 
     print("Response: {}".format(response))
 
@@ -131,8 +249,14 @@ def main(prog_name=os.path.basename(sys.argv[0]), args=None):
     setup_loggers(verbose_level=verbose_level)
 
     # Get the commands from cli args and call corresponding handlers
-    if args.command == 'add-device':
-        do_add_device(args)
+    if args.command == 'register':
+        do_register(args)
+    elif args.command == 'model-request':
+        do_model_request(args)
+    elif args.command == 'model-verify':
+        do_model_verify(args)
+    elif args.command == 'task-assign':
+        do_task_assign(args)
     else:
         raise Exception("Invalid command: {}".format(args.command))
 

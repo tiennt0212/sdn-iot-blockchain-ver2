@@ -1,0 +1,7 @@
+{
+	"nodeID": "A000001",
+    "type": "A",
+	"category": "attack-detection",
+	"size": 12345,
+	"description": "Aggregation node"
+}
